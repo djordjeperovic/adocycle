@@ -2,12 +2,25 @@
 
 `adocycle` is a TypeScript CLI for Azure DevOps work tracking.
 
+## Roadmap
+
+See [ROADMAP.md](./ROADMAP.md) for planned improvements.
+
 ### Installation
 You must install this package globally to use the CLI:
 
 ```bash
 npm install -g adocycle
 ```
+
+## PAT Prerequisites
+
+Before first use, create an Azure DevOps PAT with:
+
+- `Code (Read & write)` (`vso.code_write`)
+- `Work Items (Read & write)` (`vso.work_write`)
+
+Without these scopes, `adocycle start` cannot create branches or update work items.
 
 ## Requirements
 
@@ -94,15 +107,6 @@ If the PAT expires, `adocycle mine` prompts for a new PAT and updates local conf
 adocycle mine --reauth
 adocycle start 12345 --reauth
 ```
-
-### Required PAT permissions for `start`
-
-To create remote branches and update work items, your PAT must include:
-
-- `Code (Read & write)` (`vso.code_write`)
-- `Work Items (Read & write)` (`vso.work_write`)
-
-Without these scopes, `adocycle start` cannot create branch/update state.
 
 ## Publish Notes
 
