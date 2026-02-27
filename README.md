@@ -72,3 +72,7 @@ Publishing is configured via:
 - `bin` mapping to `dist/cli.js`
 - `files` includes `dist`
 - `prepublishOnly` runs `npm run build`
+
+## License
+
+MIT
