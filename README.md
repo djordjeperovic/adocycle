@@ -2,6 +2,13 @@
 
 `adocycle` is a TypeScript CLI for Azure DevOps work tracking.
 
+### Installation
+You must install this package globally to use the CLI:
+
+```bash
+npm install -g adocycle
+```
+
 ## Requirements
 
 - Node.js `>=20.20.0`
