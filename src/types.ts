@@ -12,6 +12,7 @@ export interface StoredConfig {
   org?: string;
   pat?: string;
   defaultLimit?: number;
+  defaultRepo?: string;
 }
 
 export type CredentialSource = "flag" | "env" | "config" | "prompt";
@@ -30,4 +31,21 @@ export interface MineCommandOptions {
   limit?: number;
   json?: boolean;
   reauth?: boolean;
+}
+
+export interface StartCommandOptions {
+  org?: string;
+  repo?: string;
+  base?: string;
+  reauth?: boolean;
+}
+
+export interface ResolvedRepoTarget {
+  source: "flag" | "config";
+  originalInput: string;
+  repoMode: "url" | "path";
+  organization: string;
+  project?: string;
+  repository: string;
+  localPath?: string;
 }

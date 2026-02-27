@@ -2,6 +2,8 @@
 
 import { Command } from "commander";
 import { registerMineCommand } from "./commands/mine.js";
+import { registerRepoCommands } from "./commands/repo.js";
+import { registerStartCommand } from "./commands/start.js";
 import { CliError } from "./errors.js";
 
 const VERSION = "0.1.0";
@@ -11,10 +13,12 @@ async function main(): Promise<void> {
 
   program
     .name("adocycle")
-    .description("CLI for fetching your Azure DevOps work items")
+    .description("CLI for Azure DevOps work item workflows")
     .version(VERSION);
 
   registerMineCommand(program);
+  registerStartCommand(program);
+  registerRepoCommands(program);
   await program.parseAsync(process.argv);
 }
 

@@ -33,12 +33,34 @@ npm run build
 adocycle mine
 ```
 
+### Start working on a work item
+
+```bash
+adocycle start 12345 --repo "D:\\repos\\my-service"
+```
+
+```bash
+adocycle start 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"
+```
+
+### Set default repository for `start`
+
+```bash
+adocycle repo set "D:\\repos\\my-service"
+adocycle repo show
+adocycle repo clear
+```
+
 ### Options
 
 ```bash
 adocycle mine --org myorg --limit 100
 adocycle mine --json
 adocycle mine --reauth
+
+adocycle start 12345 --base main
+adocycle start 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"
+adocycle start 12345 --reauth
 ```
 
 ## Output Style
@@ -70,7 +92,17 @@ If the PAT expires, `adocycle mine` prompts for a new PAT and updates local conf
 
 ```bash
 adocycle mine --reauth
+adocycle start 12345 --reauth
 ```
+
+### Required PAT permissions for `start`
+
+To create remote branches and update work items, your PAT must include:
+
+- `Code (Read & write)` (`vso.code_write`)
+- `Work Items (Read & write)` (`vso.work_write`)
+
+Without these scopes, `adocycle start` cannot create branch/update state.
 
 ## Publish Notes
 
