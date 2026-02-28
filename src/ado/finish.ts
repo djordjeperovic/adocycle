@@ -11,6 +11,7 @@ export interface PullRequestInfo {
   sourceRef: string;
   targetRef: string;
   isDraft: boolean;
+  artifactId?: string;
 }
 
 export function branchContainsWorkItemId(branchNameOrRef: string, workItemId: number): boolean {
@@ -163,7 +164,8 @@ export async function createOrReusePullRequestForFinish(
         url: latest.remoteUrl ?? buildPullRequestUrl(orgUrl, repository, id),
         sourceRef,
         targetRef,
-        isDraft: latest.isDraft === true
+        isDraft: latest.isDraft === true,
+        artifactId: latest.artifactId
       }
     };
   }
@@ -188,7 +190,8 @@ export async function createOrReusePullRequestForFinish(
       url: created.remoteUrl ?? buildPullRequestUrl(orgUrl, repository, id),
       sourceRef,
       targetRef,
-      isDraft: created.isDraft === true
+      isDraft: created.isDraft === true,
+      artifactId: created.artifactId
     }
   };
 }
@@ -201,7 +204,7 @@ export async function tryLinkPullRequestToWorkItem(
   workItemTrackingApi: Awaited<ReturnType<azdev.WebApi["getWorkItemTrackingApi"]>>,
   workItem: StartWorkItem,
   repository: RepositoryInfo,
-  pullRequestId: number
+  pullRequest: PullRequestInfo
 ): Promise<{ linked: boolean; warning?: string }> {
   if (!repository.id) {
     return {
@@ -210,8 +213,16 @@ export async function tryLinkPullRequestToWorkItem(
     };
   }
 
-  const projectId = repository.projectId ?? workItem.teamProject;
-  const artifactUri = buildPullRequestArtifactUri(projectId, repository.id, pullRequestId);
+  const artifactUri =
+    pullRequest.artifactId ??
+    (repository.projectId ? buildPullRequestArtifactUri(repository.projectId, repository.id, pullRequest.id) : undefined);
+
+  if (!artifactUri) {
+    return {
+      linked: false,
+      warning: "Cannot build pull-request artifact URI because project ID is unavailable."
+    };
+  }
 
   try {
     const existing = await workItemTrackingApi.getWorkItem(

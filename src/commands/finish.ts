@@ -152,8 +152,15 @@ async function executeFinish(
     workItemTrackingApi,
     workItem,
     repository,
-    pullRequestResult.pullRequest.id
+    pullRequestResult.pullRequest
   );
+
+  if (pullRequestResult.action === "created" && !relationResult.linked) {
+    throw new FinishPartialFailureError(
+      `Pull request #${pullRequestResult.pullRequest.id} was created (${pullRequestResult.pullRequest.url}), but linking it to work item ${workItem.id} failed: ${relationResult.warning ?? "unknown error"}. Link the PR to the work item manually, then rerun to transition state.`,
+      pullRequestResult.pullRequest
+    );
+  }
 
   try {
     await updateWorkItemStateInReview(workItemTrackingApi, workItem);
@@ -173,7 +180,7 @@ async function executeFinish(
     targetRef,
     pullRequest: pullRequestResult.pullRequest,
     pullRequestAction: pullRequestResult.action,
-    relationWarning: relationResult.warning,
+    relationWarning: pullRequestResult.action === "reused" ? relationResult.warning : undefined,
     sourceWasPushed,
     repoTarget
   };
