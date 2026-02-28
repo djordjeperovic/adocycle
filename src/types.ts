@@ -49,3 +49,38 @@ export interface ResolvedRepoTarget {
   repository: string;
   localPath?: string;
 }
+
+export interface DoctorCommandOptions {
+  org?: string;
+  repo?: string;
+  offline?: boolean;
+  json?: boolean;
+}
+
+export type DoctorCheckStatus = "pass" | "fail" | "warn" | "skip";
+
+export interface DoctorCheckResult {
+  id: string;
+  title: string;
+  status: DoctorCheckStatus;
+  blocking: boolean;
+  message: string;
+  nextActions: string[];
+}
+
+export interface DoctorCounts {
+  pass: number;
+  fail: number;
+  warn: number;
+  skip: number;
+}
+
+export interface DoctorReport {
+  ok: boolean;
+  exitCode: number;
+  offline: boolean;
+  generatedAt: string;
+  orgUrl?: string;
+  counts: DoctorCounts;
+  checks: DoctorCheckResult[];
+}

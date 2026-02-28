@@ -9,6 +9,7 @@ Make `adocycle` the fastest CLI path from assigned Azure DevOps work item to com
 - `mine` lists active items assigned to the authenticated user.
 - `start <workItemId>` creates a branch, links work item context, and moves state to `Committed`.
 - `repo set/show/clear` manages default repository path or URL for `start`.
+- `doctor` validates local/runtime setup and Azure DevOps readiness (Node, git, config, auth, repo, PAT scope) with actionable remediation.
 - PAT-based authentication with config + environment variable support.
 - CI, npm publishing configuration, and MIT licensing are in place.
 
@@ -41,13 +42,16 @@ Acceptance Criteria:
 - Non-fatal linking issues never block `start`.
 - User receives clear follow-up instructions when link creation is skipped.
 
-### 3) `doctor` Command
+### 3) `doctor` Command (Done)
+
+Status:
+- Delivered in `v0.2` baseline with `--offline` and `--json` support.
 
 Why:
 - Users need a one-command diagnosis for setup and permissions.
 
 Scope:
-- Add `adocycle doctor` to validate Node version, git availability, auth config, repo config, and required PAT scopes.
+- `adocycle doctor` validates Node version, git availability, auth config, repo config, and required PAT scopes.
 
 Acceptance Criteria:
 - `doctor` reports pass/fail checks with concrete next actions.
@@ -87,7 +91,7 @@ Why:
 - Teams need predictable machine-readable output across commands.
 
 Scope:
-- Add/standardize `--json` outputs for `start`, `repo`, and upcoming commands.
+- Add/standardize `--json` outputs for `start`, `repo`, and remaining commands (`doctor` already supports `--json`).
 - Document stable JSON output contracts.
 
 Acceptance Criteria:

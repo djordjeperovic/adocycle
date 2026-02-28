@@ -64,6 +64,15 @@ adocycle repo show
 adocycle repo clear
 ```
 
+### Diagnose setup and PAT scopes
+
+```bash
+adocycle doctor
+adocycle doctor --offline
+adocycle doctor --json
+adocycle doctor --org myorg --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"
+```
+
 ### Options
 
 ```bash
@@ -74,7 +83,17 @@ adocycle mine --reauth
 adocycle start 12345 --base main
 adocycle start 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"
 adocycle start 12345 --reauth
+
+adocycle doctor --offline
+adocycle doctor --json
 ```
+
+## Doctor Exit Behavior
+
+- `adocycle doctor` returns exit code `1` when blocking checks fail.
+- Blocking checks include Node version, git availability, org/PAT presence, Azure DevOps auth, and PAT scope probes.
+- Repository default configuration issues are warnings and do not force non-zero exit code.
+- `--offline` skips Azure DevOps auth/scope checks and reports them as skipped.
 
 ## Output Style
 
