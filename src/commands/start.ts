@@ -3,6 +3,7 @@ import { createAzureDevOpsConnection } from "../ado/client.js";
 import {
   buildStartBranchName,
   createRemoteBranch,
+  deriveCloneDirectoryFromStartBranch,
   fetchWorkItemForStart,
   resolveBaseObjectId,
   resolveRepositoryForStart,
@@ -31,6 +32,12 @@ interface StartExecutionResult {
   repositoryPath: string;
   repositoryCloneUrl: string;
   linkWarning?: string;
+  repoTarget: ResolvedRepoTarget;
+}
+
+export interface StartNextGitCommandContext {
+  branchName: string;
+  repositoryCloneUrl: string;
   repoTarget: ResolvedRepoTarget;
 }
 
@@ -100,13 +107,26 @@ function printNextSteps(result: StartExecutionResult): void {
 
   console.log("");
   console.log("Next git command:");
-  if (result.repoTarget.repoMode === "url") {
-    console.log(`git clone --single-branch --branch ${result.branchName} "${result.repositoryCloneUrl}"`);
-  } else {
-    const localPath = result.repoTarget.localPath!;
-    console.log(`git -C "${localPath}" fetch origin`);
-    console.log(`git -C "${localPath}" checkout -b "${result.branchName}" --track "origin/${result.branchName}"`);
+  for (const command of buildStartNextGitCommands(result)) {
+    console.log(command);
   }
+}
+
+export function buildStartNextGitCommands(context: StartNextGitCommandContext): string[] {
+  if (context.repoTarget.repoMode === "url") {
+    const cloneDirectory = deriveCloneDirectoryFromStartBranch(context.branchName);
+    const cloneCommand = cloneDirectory
+      ? `git clone --single-branch --branch ${context.branchName} "${context.repositoryCloneUrl}" "${cloneDirectory}"`
+      : `git clone --single-branch --branch ${context.branchName} "${context.repositoryCloneUrl}"`;
+
+    return [cloneCommand];
+  }
+
+  const localPath = context.repoTarget.localPath!;
+  return [
+    `git -C "${localPath}" fetch origin`,
+    `git -C "${localPath}" checkout -b "${context.branchName}" --track "origin/${context.branchName}"`
+  ];
 }
 
 export async function runStartCommand(workItemIdInput: string, options: StartCommandOptions): Promise<void> {

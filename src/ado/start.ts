@@ -59,6 +59,21 @@ export function buildStartBranchName(workItemId: number, title: string, workItem
   return `${prefix}/${workItemId}-${slug}`;
 }
 
+export function deriveCloneDirectoryFromStartBranch(branchNameOrRef: string): string | undefined {
+  const normalized = branchNameOrRef.trim().replace(/^refs\/heads\//i, "");
+  const match = normalized.match(/^(bug|feature)\/([^/]+)$/i);
+  if (!match) {
+    return undefined;
+  }
+
+  const directory = match[2]?.trim();
+  if (!directory) {
+    return undefined;
+  }
+
+  return directory;
+}
+
 export function normalizeBranchRef(branchNameOrRef: string): string {
   const trimmed = branchNameOrRef.trim();
   if (!trimmed) {
