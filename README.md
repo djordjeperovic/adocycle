@@ -21,6 +21,7 @@ Before first use, create an Azure DevOps PAT with:
 - `Work Items (Read & write)` (`vso.work_write`)
 
 Without these scopes, `adocycle start` cannot create branches or update work items.
+`adocycle finish` also requires these scopes to create/reuse pull requests and move state to review.
 
 ## Requirements
 
@@ -56,7 +57,15 @@ adocycle start 12345 --repo "D:\\repos\\my-service"
 adocycle start 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"
 ```
 
-### Set default repository for `start`
+### Finish work and hand off to review
+
+```bash
+adocycle finish 12345 --repo "D:\\repos\\my-service"
+adocycle finish 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo" --target main
+adocycle finish 12345 --draft
+```
+
+### Set default repository for `start` and `finish`
 
 ```bash
 adocycle repo set "D:\\repos\\my-service"
@@ -83,6 +92,10 @@ adocycle mine --reauth
 adocycle start 12345 --base main
 adocycle start 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"
 adocycle start 12345 --reauth
+
+adocycle finish 12345 --target develop
+adocycle finish 12345 --draft
+adocycle finish 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"
 
 adocycle doctor --offline
 adocycle doctor --json

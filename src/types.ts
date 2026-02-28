@@ -40,6 +40,14 @@ export interface StartCommandOptions {
   reauth?: boolean;
 }
 
+export interface FinishCommandOptions {
+  org?: string;
+  repo?: string;
+  target?: string;
+  draft?: boolean;
+  reauth?: boolean;
+}
+
 export interface ResolvedRepoTarget {
   source: "flag" | "config";
   originalInput: string;

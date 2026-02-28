@@ -2,6 +2,7 @@
 
 import { Command } from "commander";
 import { registerDoctorCommand } from "./commands/doctor.js";
+import { registerFinishCommand } from "./commands/finish.js";
 import { registerMineCommand } from "./commands/mine.js";
 import { registerRepoCommands } from "./commands/repo.js";
 import { registerStartCommand } from "./commands/start.js";
@@ -19,6 +20,7 @@ async function main(): Promise<void> {
 
   registerMineCommand(program);
   registerStartCommand(program);
+  registerFinishCommand(program);
   registerRepoCommands(program);
   registerDoctorCommand(program);
   await program.parseAsync(process.argv);

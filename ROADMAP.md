@@ -8,7 +8,8 @@ Make `adocycle` the fastest CLI path from assigned Azure DevOps work item to com
 
 - `mine` lists active items assigned to the authenticated user.
 - `start <workItemId>` creates a branch, links work item context, and moves state to `Committed`.
-- `repo set/show/clear` manages default repository path or URL for `start`.
+- `finish <workItemId>` validates context, prepares PR handoff (create/reuse), links PR to work item, and moves state to `In Review`.
+- `repo set/show/clear` manages default repository path or URL for `start` and `finish`.
 - `doctor` validates local/runtime setup and Azure DevOps readiness (Node, git, config, auth, repo, PAT scope) with actionable remediation.
 - PAT-based authentication with config + environment variable support.
 - CI, npm publishing configuration, and MIT licensing are in place.
@@ -69,23 +70,26 @@ Scope:
 Acceptance Criteria:
 - Users can inspect current config safely without exposing PAT values.
 
-## Phase: Next
+### 5) `finish` Command (Done)
 
-### 1) `finish` Command (paired with `start`)
+Status:
+- Delivered as part of the `v0.3` workflow baseline.
 
 Why:
 - The workflow should include a clear “complete implementation / handoff to review” command, not only `start`.
 
 Scope:
-- Add `adocycle finish <workItemId> [--repo <path-or-url>] [--target <branch>] [--draft]`.
-- Validate branch/work item context before proceeding.
-- Prepare review handoff flow and transition work item to a review-ready state.
+- Added `adocycle finish <workItemId> [--repo <path-or-url>] [--target <branch>] [--draft]`.
+- Validates branch/work item context before PR handoff.
+- Creates/reuses active PR, links PR context to the work item, and transitions state to `In Review`.
 
 Acceptance Criteria:
 - `start -> finish` forms a complete, repeatable workflow in the CLI.
 - `finish` prints clear next actions and preserves auditability.
 
-### 2) Output and Automation Consistency
+## Phase: Next
+
+### 1) Output and Automation Consistency
 
 Why:
 - Teams need predictable machine-readable output across commands.
@@ -97,7 +101,7 @@ Scope:
 Acceptance Criteria:
 - Scripts can rely on stable output schema for core commands.
 
-### 3) `mine` Power Filters
+### 2) `mine` Power Filters
 
 Why:
 - Users need better triage controls in large organizations.
@@ -158,7 +162,7 @@ Acceptance Criteria:
 ## Release Milestones
 
 - `v0.2`: reliability, diagnostics (`doctor`), and config UX polish.
-- `v0.3`: workflow completion with `finish`, plus output schema consistency.
+- `v0.3`: workflow completion with `finish` (delivered), plus output schema consistency.
 - `v0.4`: profiles, filters, and team policy support.
 - `v1.0`: stable workflow platform with hardened UX, docs, and release process.
 

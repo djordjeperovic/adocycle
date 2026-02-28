@@ -53,3 +53,42 @@ export async function getOriginRemoteUrl(repoPath: string): Promise<string> {
   }
   return remoteUrl;
 }
+
+export async function getCurrentBranchName(repoPath: string): Promise<string> {
+  const branchName = await runGit(["rev-parse", "--abbrev-ref", "HEAD"], repoPath);
+  if (!branchName || branchName.toUpperCase() === "HEAD") {
+    throw new CliError(
+      `Cannot determine current branch in ${repoPath}. Checkout a branch before running this command.`
+    );
+  }
+  return branchName;
+}
+
+export async function hasRemoteTrackingBranch(repoPath: string, branchName: string): Promise<boolean> {
+  try {
+    await execFileAsync("git", ["rev-parse", "--verify", "--quiet", `refs/remotes/origin/${branchName}`], {
+      cwd: repoPath,
+      windowsHide: true,
+      encoding: "utf8"
+    });
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+export async function getAheadCommitCount(repoPath: string, branchName: string): Promise<number> {
+  const ahead = await runGit(
+    ["rev-list", "--count", `refs/remotes/origin/${branchName}..refs/heads/${branchName}`],
+    repoPath
+  );
+  const parsed = Number.parseInt(ahead, 10);
+  if (!Number.isFinite(parsed) || parsed < 0) {
+    throw new CliError(`Unable to determine ahead commit count for branch '${branchName}'.`);
+  }
+  return parsed;
+}
+
+export async function pushBranchToOrigin(repoPath: string, branchName: string): Promise<void> {
+  await runGit(["push", "-u", "origin", branchName], repoPath);
+}
