@@ -227,7 +227,7 @@ export async function tryLinkPullRequestToWorkItem(
   try {
     const existing = await workItemTrackingApi.getWorkItem(
       workItem.id,
-      ["System.Id"],
+      undefined,
       undefined,
       WorkItemExpand.Relations,
       workItem.teamProject
