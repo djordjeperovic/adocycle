@@ -1,6 +1,6 @@
 {
   "name": "adocycle",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Azure DevOps CLI for querying your assigned work items",
   "type": "module",
   "main": "./dist/cli.js",
