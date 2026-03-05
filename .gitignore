@@ -8,3 +8,4 @@ coverage/
 *.log
 *.tgz
 *.tsbuildinfo
+*.wiql

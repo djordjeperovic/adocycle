@@ -58,6 +58,25 @@ export interface ResolvedRepoTarget {
   localPath?: string;
 }
 
+export interface QueryCommandOptions {
+  org?: string;
+  project?: string;
+  top?: number;
+  file?: string;
+  table?: boolean;
+  reauth?: boolean;
+}
+
+export interface QueryWorkItem {
+  id: number;
+  fields: Record<string, unknown>;
+}
+
+export interface QueryColumnInfo {
+  referenceName: string;
+  name: string;
+}
+
 export interface DoctorCommandOptions {
   org?: string;
   repo?: string;

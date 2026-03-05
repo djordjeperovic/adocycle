@@ -65,6 +65,22 @@ adocycle finish 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"
 adocycle finish 12345 --draft
 ```
 
+### Run an arbitrary WIQL query
+
+```bash
+adocycle query "SELECT [System.Id], [System.Title], [System.State] FROM WorkItems WHERE [System.AssignedTo] = @Me AND [System.State] <> 'Closed'"
+```
+
+```bash
+adocycle query --file team-work.wiql --table
+```
+
+```bash
+echo "SELECT [System.Id] FROM WorkItems WHERE [System.State] = 'New'" | adocycle query
+```
+
+Queries run across all projects by default (like the ADO web UI with "Query across projects" checked). Use `--project` to scope to a single project.
+
 ### Set default repository for `start` and `finish`
 
 ```bash
@@ -99,6 +115,10 @@ adocycle finish 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"
 
 adocycle doctor --offline
 adocycle doctor --json
+
+adocycle query "SELECT ..." --org myorg --project MyProject --top 500
+adocycle query "SELECT ..." --table
+adocycle query --file my-query.wiql
 ```
 
 ## Doctor Exit Behavior
