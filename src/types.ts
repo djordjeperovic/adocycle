@@ -54,6 +54,12 @@ export interface CommentCommandOptions {
   reauth?: boolean;
 }
 
+export interface AssignCommandOptions {
+  org?: string;
+  unassign?: boolean;
+  reauth?: boolean;
+}
+
 export interface ResolvedRepoTarget {
   source: "flag" | "config";
   originalInput: string;

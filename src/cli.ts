@@ -2,6 +2,7 @@
 
 import { createRequire } from "node:module";
 import { Command } from "commander";
+import { registerAssignCommand } from "./commands/assign.js";
 import { registerCommentCommand } from "./commands/comment.js";
 import { registerDoctorCommand } from "./commands/doctor.js";
 import { registerFinishCommand } from "./commands/finish.js";
@@ -23,6 +24,7 @@ async function main(): Promise<void> {
   registerStartCommand(program);
   registerFinishCommand(program);
   registerCommentCommand(program);
+  registerAssignCommand(program);
   registerQueryCommand(program);
   registerRepoCommands(program);
   registerDoctorCommand(program);
