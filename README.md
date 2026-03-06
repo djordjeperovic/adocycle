@@ -22,6 +22,7 @@ Before first use, create an Azure DevOps PAT with:
 
 Without these scopes, `adocycle start` cannot create branches or update work items.
 `adocycle finish` also requires these scopes to create/reuse pull requests and move state to review.
+`adocycle comment` uses `Work Items (Read & write)` to add comments to existing work items.
 
 ## Requirements
 
@@ -55,6 +56,13 @@ adocycle start 12345 --repo "D:\\repos\\my-service"
 
 ```bash
 adocycle start 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"
+```
+
+### Add a comment to a work item
+
+```bash
+adocycle comment 12345 "Started investigation and captured repro steps."
+adocycle comment 12345 --file work-note.md
 ```
 
 ### Finish work and hand off to review
@@ -109,6 +117,10 @@ adocycle start 12345 --base main
 adocycle start 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"
 adocycle start 12345 --reauth
 
+adocycle comment 12345 "Shared an update for the team"
+adocycle comment 12345 --file update.md
+adocycle comment 12345 "Shared an update for the team" --reauth
+
 adocycle finish 12345 --target develop
 adocycle finish 12345 --draft
 adocycle finish 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"
@@ -158,6 +170,7 @@ If the PAT expires, `adocycle mine` prompts for a new PAT and updates local conf
 ```bash
 adocycle mine --reauth
 adocycle start 12345 --reauth
+adocycle comment 12345 "Following up after PAT refresh" --reauth
 ```
 
 ## Publish Notes

@@ -48,6 +48,12 @@ export interface FinishCommandOptions {
   reauth?: boolean;
 }
 
+export interface CommentCommandOptions {
+  org?: string;
+  file?: string;
+  reauth?: boolean;
+}
+
 export interface ResolvedRepoTarget {
   source: "flag" | "config";
   originalInput: string;
