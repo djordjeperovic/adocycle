@@ -19,9 +19,7 @@ export function formatCellValue(value: unknown): string {
 }
 
 export function deriveHeaderLabels(columns: QueryColumnInfo[]): string[] {
-  return columns.map((col) =>
-    col.name.length > 0 ? col.name : col.referenceName
-  );
+  return columns.map((col) => (col.name.length > 0 ? col.name : col.referenceName));
 }
 
 export function renderQueryTable(columns: QueryColumnInfo[], items: QueryWorkItem[]): string {
@@ -43,9 +41,7 @@ export function renderQueryTable(columns: QueryColumnInfo[], items: QueryWorkIte
   });
 
   const idIndex = columns.findIndex((col) => col.referenceName === "System.Id");
-  const colAligns: Array<"left" | "right"> = headers.map((_, index) =>
-    index === idIndex ? "right" : "left"
-  );
+  const colAligns: Array<"left" | "right"> = headers.map((_, index) => (index === idIndex ? "right" : "left"));
 
   const table = new Table({
     head: headers.map((h) => chalk.bold(h)),

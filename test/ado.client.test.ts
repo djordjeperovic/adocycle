@@ -7,9 +7,7 @@ describe("normalizeOrganizationUrl", () => {
   });
 
   it("normalizes dev.azure.com project URLs to org root", () => {
-    expect(normalizeOrganizationUrl("https://dev.azure.com/myorg/MyProject")).toBe(
-      "https://dev.azure.com/myorg"
-    );
+    expect(normalizeOrganizationUrl("https://dev.azure.com/myorg/MyProject")).toBe("https://dev.azure.com/myorg");
   });
 
   it("normalizes visualstudio URLs", () => {

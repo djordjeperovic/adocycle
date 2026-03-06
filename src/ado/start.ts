@@ -45,7 +45,10 @@ export function createBranchSlug(title: string, maxLength = 60): string {
     .replace(/[\u0300-\u036f]/g, "")
     .toLowerCase();
 
-  const slug = normalized.replace(/[^a-z0-9]+/g, "-").replace(/-+/g, "-").replace(/^-+|-+$/g, "");
+  const slug = normalized
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-+|-+$/g, "");
   if (!slug) {
     return "work-item";
   }
@@ -250,9 +253,7 @@ export async function createRemoteBranch(
     }
 
     if (status === GIT_REF_UPDATE_STATUS_CREATE_BRANCH_PERMISSION_REQUIRED) {
-      throw new CliError(
-        "PAT is missing permission to create branches. Ensure PAT has Code (Read & write) scope."
-      );
+      throw new CliError("PAT is missing permission to create branches. Ensure PAT has Code (Read & write) scope.");
     }
 
     const customMessage = firstResult?.customMessage ? ` ${firstResult.customMessage}` : "";

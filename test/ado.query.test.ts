@@ -56,6 +56,9 @@ describe("batchIds", () => {
   });
 
   it("handles exact multiple of batch size", () => {
-    expect(batchIds([1, 2, 3, 4], 2)).toEqual([[1, 2], [3, 4]]);
+    expect(batchIds([1, 2, 3, 4], 2)).toEqual([
+      [1, 2],
+      [3, 4]
+    ]);
   });
 });

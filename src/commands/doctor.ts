@@ -4,7 +4,12 @@ import { Command } from "commander";
 import { createAzureDevOpsConnection, normalizeOrganizationUrl } from "../ado/client.js";
 import { getConfigFilePath } from "../config/paths.js";
 import { readStoredConfig } from "../config/store.js";
-import { compareSemver, createDoctorReport, resolveDoctorOrganizationValue, resolveDoctorPatValue } from "../doctor/checks.js";
+import {
+  compareSemver,
+  createDoctorReport,
+  resolveDoctorOrganizationValue,
+  resolveDoctorPatValue
+} from "../doctor/checks.js";
 import { probeCodeWriteScope, probeWorkWriteScope } from "../doctor/probes.js";
 import { getHttpStatusCode, isAuthError } from "../errors.js";
 import { renderDoctorReport } from "../output/doctor.js";
@@ -62,10 +67,14 @@ export async function runDoctorCommand(options: DoctorCommandOptions): Promise<v
     );
   } else {
     checks.push(
-      check("runtime.node", "Node.js version", "fail", true, `Detected ${nodeVersion}; requires >= ${MINIMUM_NODE_VERSION}.`, [
-        `Install Node.js ${MINIMUM_NODE_VERSION} or newer.`,
-        "Run `adocycle doctor` again after upgrading."
-      ])
+      check(
+        "runtime.node",
+        "Node.js version",
+        "fail",
+        true,
+        `Detected ${nodeVersion}; requires >= ${MINIMUM_NODE_VERSION}.`,
+        [`Install Node.js ${MINIMUM_NODE_VERSION} or newer.`, "Run `adocycle doctor` again after upgrading."]
+      )
     );
   }
 
@@ -142,19 +151,24 @@ export async function runDoctorCommand(options: DoctorCommandOptions): Promise<v
       ])
     );
   } else {
-    checks.push(
-      check("auth.pat", "PAT configuration", "pass", true, `PAT is configured via ${patResolution.source}.`)
-    );
+    checks.push(check("auth.pat", "PAT configuration", "pass", true, `PAT is configured via ${patResolution.source}.`));
   }
 
   const defaultRepo = configReadable ? storedConfig.defaultRepo : undefined;
   let resolvedRepoTarget: ResolvedRepoTarget | undefined;
   if (!options.repo && !defaultRepo) {
     checks.push(
-      check("repo.target", "Repository configuration", "warn", false, "No repository configured for `start` defaults.", [
-        "Set default repository with `adocycle repo set <path-or-url>`.",
-        "Or pass `--repo <path-or-url>` when running `adocycle start`."
-      ])
+      check(
+        "repo.target",
+        "Repository configuration",
+        "warn",
+        false,
+        "No repository configured for `start` defaults.",
+        [
+          "Set default repository with `adocycle repo set <path-or-url>`.",
+          "Or pass `--repo <path-or-url>` when running `adocycle start`."
+        ]
+      )
     );
   } else if (!orgUrl) {
     checks.push(
@@ -185,10 +199,17 @@ export async function runDoctorCommand(options: DoctorCommandOptions): Promise<v
       );
     } catch (error) {
       checks.push(
-        check("repo.target", "Repository configuration", "warn", false, `Repository validation failed: ${asMessage(error)}`, [
-          "Update the configured repository with `adocycle repo set <path-or-url>`.",
-          "Or pass a valid `--repo <path-or-url>`."
-        ])
+        check(
+          "repo.target",
+          "Repository configuration",
+          "warn",
+          false,
+          `Repository validation failed: ${asMessage(error)}`,
+          [
+            "Update the configured repository with `adocycle repo set <path-or-url>`.",
+            "Or pass a valid `--repo <path-or-url>`."
+          ]
+        )
       );
     }
   }
@@ -212,7 +233,13 @@ export async function runDoctorCommand(options: DoctorCommandOptions): Promise<v
       )
     );
     checks.push(
-      check("ado.scope.work_write", "PAT scope: Work Items write", "skip", true, "Skipped because auth prerequisites failed.")
+      check(
+        "ado.scope.work_write",
+        "PAT scope: Work Items write",
+        "skip",
+        true,
+        "Skipped because auth prerequisites failed."
+      )
     );
     checks.push(
       check("ado.scope.code_write", "PAT scope: Code write", "skip", true, "Skipped because auth prerequisites failed.")
@@ -223,8 +250,7 @@ export async function runDoctorCommand(options: DoctorCommandOptions): Promise<v
     try {
       const connectionData = await connection.connect();
       const who =
-        connectionData.authorizedUser?.providerDisplayName ??
-        connectionData.authenticatedUser?.providerDisplayName;
+        connectionData.authorizedUser?.providerDisplayName ?? connectionData.authenticatedUser?.providerDisplayName;
       checks.push(
         check(
           "ado.auth",
@@ -246,10 +272,7 @@ export async function runDoctorCommand(options: DoctorCommandOptions): Promise<v
           true,
           authHint ? "Azure DevOps authentication failed." : `Azure DevOps connection failed: ${asMessage(error)}`,
           authHint
-            ? [
-                "Ensure organization URL and PAT are correct.",
-                "Recreate PAT if needed, then rerun `adocycle doctor`."
-              ]
+            ? ["Ensure organization URL and PAT are correct.", "Recreate PAT if needed, then rerun `adocycle doctor`."]
             : ["Check network/VPN connectivity to Azure DevOps and retry."]
         )
       );
@@ -257,10 +280,22 @@ export async function runDoctorCommand(options: DoctorCommandOptions): Promise<v
 
     if (!authPassed) {
       checks.push(
-        check("ado.scope.work_write", "PAT scope: Work Items write", "skip", true, "Skipped because connectivity check failed.")
+        check(
+          "ado.scope.work_write",
+          "PAT scope: Work Items write",
+          "skip",
+          true,
+          "Skipped because connectivity check failed."
+        )
       );
       checks.push(
-        check("ado.scope.code_write", "PAT scope: Code write", "skip", true, "Skipped because connectivity check failed.")
+        check(
+          "ado.scope.code_write",
+          "PAT scope: Code write",
+          "skip",
+          true,
+          "Skipped because connectivity check failed."
+        )
       );
     } else {
       const workItemTrackingApi = await connection.getWorkItemTrackingApi();
@@ -268,11 +303,27 @@ export async function runDoctorCommand(options: DoctorCommandOptions): Promise<v
 
       const workProbe = await probeWorkWriteScope(workItemTrackingApi);
       checks.push(
-        check("ado.scope.work_write", "PAT scope: Work Items write", workProbe.status, true, workProbe.message, workProbe.nextActions)
+        check(
+          "ado.scope.work_write",
+          "PAT scope: Work Items write",
+          workProbe.status,
+          true,
+          workProbe.message,
+          workProbe.nextActions
+        )
       );
 
       const codeProbe = await probeCodeWriteScope(gitApi, resolvedRepoTarget);
-      checks.push(check("ado.scope.code_write", "PAT scope: Code write", codeProbe.status, true, codeProbe.message, codeProbe.nextActions));
+      checks.push(
+        check(
+          "ado.scope.code_write",
+          "PAT scope: Code write",
+          codeProbe.status,
+          true,
+          codeProbe.message,
+          codeProbe.nextActions
+        )
+      );
     }
   }
 

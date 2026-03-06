@@ -15,7 +15,7 @@ interface PickedValue {
   source: CredentialSource;
 }
 
-function isInteractiveTerminal(): boolean {
+export function isInteractiveTerminal(): boolean {
   return Boolean(process.stdin.isTTY && process.stdout.isTTY);
 }
 

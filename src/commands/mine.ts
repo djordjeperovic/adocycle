@@ -2,8 +2,8 @@ import { Command, InvalidArgumentError } from "commander";
 import { fetchMyWorkItems } from "../ado/myWork.js";
 import { createAzureDevOpsConnection } from "../ado/client.js";
 import { fetchMyWorkItemsViaWiqlFallback } from "../ado/wiqlFallback.js";
-import { persistPat, resolveCredentialsForMine } from "../auth/credentials.js";
-import { promptForPat } from "../auth/prompt.js";
+import { resolveCredentialsForMine } from "../auth/credentials.js";
+import { withAuthRetry } from "../auth/retry.js";
 import { isAuthError } from "../errors.js";
 import { renderMineJson } from "../output/json.js";
 import { renderMineTable } from "../output/table.js";
@@ -16,10 +16,6 @@ interface MineFetchResult {
   items: MineWorkItem[];
   source: "my-work" | "wiql-fallback";
   querySizeLimitExceeded: boolean;
-}
-
-function isInteractiveTerminal(): boolean {
-  return Boolean(process.stdin.isTTY && process.stdout.isTTY);
 }
 
 function parseLimit(value: string): number {
@@ -60,26 +56,14 @@ async function fetchMineWithFallback(orgUrl: string, pat: string, limit: number)
 
 export async function runMineCommand(options: MineCommandOptions): Promise<void> {
   const limit = options.limit ?? DEFAULT_LIMIT;
-  let credentials = await resolveCredentialsForMine({
+  const credentials = await resolveCredentialsForMine({
     org: options.org,
     reauth: options.reauth
   });
 
-  let fetchResult: MineFetchResult;
-  try {
-    fetchResult = await fetchMineWithFallback(credentials.orgUrl, credentials.pat, limit);
-  } catch (error) {
-    if (!isAuthError(error) || !isInteractiveTerminal()) {
-      throw error;
-    }
-
-    console.error("Azure DevOps authentication failed (token may be expired).");
-    const newPat = await promptForPat("Paste a new Azure DevOps PAT:");
-    await persistPat(newPat, credentials.orgInput, credentials.configFilePath);
-
-    credentials = { ...credentials, pat: newPat, patSource: "prompt" };
-    fetchResult = await fetchMineWithFallback(credentials.orgUrl, credentials.pat, limit);
-  }
+  const fetchResult = await withAuthRetry(credentials, (creds) =>
+    fetchMineWithFallback(creds.orgUrl, creds.pat, limit)
+  );
 
   if (options.json) {
     console.log(renderMineJson(fetchResult.items));

@@ -58,6 +58,8 @@ export async function fetchMyWorkItemsViaWiqlFallback(
   const perProjectTop = Math.max(limit, 1);
   const allItems: MineWorkItem[] = [];
 
+  const failedProjects: string[] = [];
+
   for (const projectName of projectNames) {
     try {
       const queryResult = await workItemTrackingApi.queryByWiql(
@@ -97,8 +99,12 @@ export async function fetchMyWorkItemsViaWiqlFallback(
       if (isAuthError(error)) {
         throw error;
       }
-      // Ignore project-level failures and continue collecting from other projects.
+      failedProjects.push(projectName);
     }
+  }
+
+  if (failedProjects.length > 0) {
+    console.error(`Note: Could not query ${failedProjects.length} project(s): ${failedProjects.join(", ")}`);
   }
 
   return sortAndLimit(allItems, limit);

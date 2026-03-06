@@ -51,7 +51,9 @@ async function runRepoClear(): Promise<void> {
 }
 
 export function registerRepoCommands(program: Command): void {
-  const repoCommand = program.command("repo").description("Manage default repository path/URL for start/finish commands.");
+  const repoCommand = program
+    .command("repo")
+    .description("Manage default repository path/URL for start/finish commands.");
 
   repoCommand
     .command("set")

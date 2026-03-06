@@ -15,9 +15,7 @@ export async function promptForOrganization(defaultValue?: string): Promise<stri
   return organization.trim();
 }
 
-export async function promptForPat(
-  message = "Azure DevOps Personal Access Token (PAT):"
-): Promise<string> {
+export async function promptForPat(message = "Azure DevOps Personal Access Token (PAT):"): Promise<string> {
   const pat = await password({
     message,
     mask: true,

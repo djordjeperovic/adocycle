@@ -41,10 +41,7 @@ export function classifyWorkWriteProbeError(error: unknown): ScopeProbeResult {
   return {
     status: "fail",
     message: `Work-item write probe failed: ${asMessage(error)}`,
-    nextActions: [
-      "Verify network access to Azure DevOps.",
-      "Re-run `adocycle doctor` to confirm scope status."
-    ]
+    nextActions: ["Verify network access to Azure DevOps.", "Re-run `adocycle doctor` to confirm scope status."]
   };
 }
 

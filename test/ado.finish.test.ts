@@ -27,11 +27,7 @@ describe("finish helpers", () => {
   });
 
   it("selects pull request with highest ID as latest", () => {
-    const selected = selectLatestPullRequest([
-      { pullRequestId: 102 },
-      { pullRequestId: 99 },
-      { pullRequestId: 145 }
-    ]);
+    const selected = selectLatestPullRequest([{ pullRequestId: 102 }, { pullRequestId: 99 }, { pullRequestId: 145 }]);
 
     expect(selected?.pullRequestId).toBe(145);
   });

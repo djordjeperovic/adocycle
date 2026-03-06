@@ -49,12 +49,7 @@ export async function executeWiqlQuery(
   const workItemTrackingApi = await connection.getWorkItemTrackingApi();
 
   const teamContext = project ? { project } : undefined;
-  const queryResult = await workItemTrackingApi.queryByWiql(
-    { query: wiql },
-    teamContext,
-    true,
-    top
-  );
+  const queryResult = await workItemTrackingApi.queryByWiql({ query: wiql }, teamContext, true, top);
 
   if (queryResult.queryResultType === QueryResultType.WorkItemLink) {
     throw new CliError(
@@ -62,13 +57,12 @@ export async function executeWiqlQuery(
     );
   }
 
-  const columns = queryResult.columns && queryResult.columns.length > 0
-    ? extractColumnsFromQueryResult(queryResult.columns)
-    : DEFAULT_FIELDS;
+  const columns =
+    queryResult.columns && queryResult.columns.length > 0
+      ? extractColumnsFromQueryResult(queryResult.columns)
+      : DEFAULT_FIELDS;
 
-  const ids = (queryResult.workItems ?? [])
-    .map((ref) => ref.id)
-    .filter((id): id is number => typeof id === "number");
+  const ids = (queryResult.workItems ?? []).map((ref) => ref.id).filter((id): id is number => typeof id === "number");
 
   if (ids.length === 0) {
     return { columns, items: [] };
@@ -83,13 +77,7 @@ export async function executeWiqlQuery(
 
   const batchResults = await Promise.all(
     batches.map((batch) =>
-      workItemTrackingApi.getWorkItems(
-        batch,
-        fieldRefs,
-        undefined,
-        undefined,
-        WorkItemErrorPolicy.Omit
-      )
+      workItemTrackingApi.getWorkItems(batch, fieldRefs, undefined, undefined, WorkItemErrorPolicy.Omit)
     )
   );
 

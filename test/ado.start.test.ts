@@ -30,9 +30,7 @@ describe("start helpers", () => {
   it("derives clone directory from start branch names", () => {
     expect(deriveCloneDirectoryFromStartBranch("feature/43761-add-login-form")).toBe("43761-add-login-form");
     expect(deriveCloneDirectoryFromStartBranch("bug/12345-fix-crash")).toBe("12345-fix-crash");
-    expect(deriveCloneDirectoryFromStartBranch("refs/heads/feature/43761-add-login-form")).toBe(
-      "43761-add-login-form"
-    );
+    expect(deriveCloneDirectoryFromStartBranch("refs/heads/feature/43761-add-login-form")).toBe("43761-add-login-form");
   });
 
   it("returns undefined for non-start branch patterns", () => {

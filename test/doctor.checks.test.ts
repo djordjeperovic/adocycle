@@ -22,7 +22,11 @@ describe("doctor checks helpers", () => {
     expect(fromFlag.value).toBe("flag-org");
     expect(fromFlag.source).toBe("flag");
 
-    const fromEnvUrl = resolveDoctorOrganizationValue(undefined, { org: "config-org" }, { ADO_ORG_URL: "https://dev.azure.com/env-url" });
+    const fromEnvUrl = resolveDoctorOrganizationValue(
+      undefined,
+      { org: "config-org" },
+      { ADO_ORG_URL: "https://dev.azure.com/env-url" }
+    );
     expect(fromEnvUrl.value).toBe("https://dev.azure.com/env-url");
     expect(fromEnvUrl.source).toBe("env");
 

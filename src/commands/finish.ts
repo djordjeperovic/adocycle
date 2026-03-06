@@ -11,13 +11,19 @@ import {
   type PullRequestInfo
 } from "../ado/finish.js";
 import { fetchWorkItemForStart, normalizeBranchRef, resolveRepositoryForStart } from "../ado/start.js";
-import { persistPat, resolveCredentialsForMine } from "../auth/credentials.js";
-import { promptForPat } from "../auth/prompt.js";
+import { resolveCredentialsForMine } from "../auth/credentials.js";
+import { withAuthRetry } from "../auth/retry.js";
 import { readStoredConfig } from "../config/store.js";
-import { CliError, isAuthError } from "../errors.js";
-import { pushBranchToOrigin, getAheadCommitCount, getCurrentBranchName, hasRemoteTrackingBranch } from "../repo/localGit.js";
+import { CliError } from "../errors.js";
+import {
+  pushBranchToOrigin,
+  getAheadCommitCount,
+  getCurrentBranchName,
+  hasRemoteTrackingBranch
+} from "../repo/localGit.js";
 import { resolveRepoTarget } from "../repo/target.js";
 import type { FinishCommandOptions, ResolvedRepoTarget } from "../types.js";
+import { parseWorkItemId } from "./shared.js";
 
 class FinishPartialFailureError extends CliError {
   constructor(
@@ -40,18 +46,6 @@ interface FinishExecutionResult {
   relationWarning?: string;
   sourceWasPushed: boolean;
   repoTarget: ResolvedRepoTarget;
-}
-
-function isInteractiveTerminal(): boolean {
-  return Boolean(process.stdin.isTTY && process.stdout.isTTY);
-}
-
-function parseWorkItemId(value: string): number {
-  const parsed = Number.parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    throw new CliError(`Work item ID must be a positive integer. Received: ${value}`);
-  }
-  return parsed;
 }
 
 function shortBranchName(branchRef: string): string {
@@ -212,32 +206,17 @@ function printNextSteps(result: FinishExecutionResult): void {
 
 export async function runFinishCommand(workItemIdInput: string, options: FinishCommandOptions): Promise<void> {
   const workItemId = parseWorkItemId(workItemIdInput);
-  let credentials = await resolveCredentialsForMine({
+  const credentials = await resolveCredentialsForMine({
     org: options.org,
     reauth: options.reauth
   });
 
-  try {
-    const result = await executeFinish(options, workItemId, credentials.pat, credentials.orgUrl, credentials.configFilePath);
-    printNextSteps(result);
-    return;
-  } catch (error) {
-    if (error instanceof FinishPartialFailureError) {
-      throw error;
-    }
-
-    if (!isAuthError(error) || !isInteractiveTerminal()) {
-      throw error;
-    }
-
-    console.error("Azure DevOps authentication failed (token may be expired).");
-    const newPat = await promptForPat("Paste a new Azure DevOps PAT:");
-    await persistPat(newPat, credentials.orgInput, credentials.configFilePath);
-    credentials = { ...credentials, pat: newPat, patSource: "prompt" };
-
-    const retried = await executeFinish(options, workItemId, credentials.pat, credentials.orgUrl, credentials.configFilePath);
-    printNextSteps(retried);
-  }
+  const result = await withAuthRetry(
+    credentials,
+    (creds) => executeFinish(options, workItemId, creds.pat, creds.orgUrl, creds.configFilePath),
+    (error) => error instanceof FinishPartialFailureError
+  );
+  printNextSteps(result);
 }
 
 export function registerFinishCommand(program: Command): void {

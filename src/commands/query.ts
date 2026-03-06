@@ -2,19 +2,15 @@ import { readFile } from "node:fs/promises";
 import { Command, InvalidArgumentError } from "commander";
 import { createAzureDevOpsConnection } from "../ado/client.js";
 import { executeWiqlQuery, type WiqlQueryResult } from "../ado/query.js";
-import { persistPat, resolveCredentialsForMine } from "../auth/credentials.js";
-import { promptForPat } from "../auth/prompt.js";
-import { CliError, isAuthError } from "../errors.js";
+import { resolveCredentialsForMine } from "../auth/credentials.js";
+import { withAuthRetry } from "../auth/retry.js";
+import { CliError } from "../errors.js";
 import { renderQueryJson } from "../output/json.js";
 import { renderQueryTable } from "../output/queryTable.js";
 import type { QueryCommandOptions } from "../types.js";
 
 const DEFAULT_TOP = 200;
 const MAX_TOP = 20_000;
-
-function isInteractiveTerminal(): boolean {
-  return Boolean(process.stdin.isTTY && process.stdout.isTTY);
-}
 
 function parseTop(value: string): number {
   const parsed = Number.parseInt(value, 10);
@@ -65,9 +61,7 @@ async function resolveWiql(wiqlArg: string | undefined, options: QueryCommandOpt
     return trimmed;
   }
 
-  throw new CliError(
-    "No WIQL query provided. Pass it as an argument, use --file <path>, or pipe via stdin."
-  );
+  throw new CliError("No WIQL query provided. Pass it as an argument, use --file <path>, or pipe via stdin.");
 }
 
 async function executeQuery(
@@ -81,33 +75,18 @@ async function executeQuery(
   return executeWiqlQuery(connection, wiql, project, top);
 }
 
-export async function runQueryCommand(
-  wiqlArg: string | undefined,
-  options: QueryCommandOptions
-): Promise<void> {
+export async function runQueryCommand(wiqlArg: string | undefined, options: QueryCommandOptions): Promise<void> {
   const wiql = await resolveWiql(wiqlArg, options);
   const top = options.top ?? DEFAULT_TOP;
 
-  let credentials = await resolveCredentialsForMine({
+  const credentials = await resolveCredentialsForMine({
     org: options.org,
     reauth: options.reauth
   });
 
-  let result: WiqlQueryResult;
-  try {
-    result = await executeQuery(credentials.orgUrl, credentials.pat, wiql, options.project, top);
-  } catch (error) {
-    if (!isAuthError(error) || !isInteractiveTerminal()) {
-      throw error;
-    }
-
-    console.error("Azure DevOps authentication failed (token may be expired).");
-    const newPat = await promptForPat("Paste a new Azure DevOps PAT:");
-    await persistPat(newPat, credentials.orgInput, credentials.configFilePath);
-
-    credentials = { ...credentials, pat: newPat, patSource: "prompt" };
-    result = await executeQuery(credentials.orgUrl, credentials.pat, wiql, options.project, top);
-  }
+  const result = await withAuthRetry(credentials, (creds) =>
+    executeQuery(creds.orgUrl, creds.pat, wiql, options.project, top)
+  );
 
   if (options.table) {
     if (result.items.length === 0) {

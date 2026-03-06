@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 
+import { createRequire } from "node:module";
 import { Command } from "commander";
 import { registerDoctorCommand } from "./commands/doctor.js";
 import { registerFinishCommand } from "./commands/finish.js";
@@ -9,15 +10,13 @@ import { registerRepoCommands } from "./commands/repo.js";
 import { registerStartCommand } from "./commands/start.js";
 import { CliError } from "./errors.js";
 
-const VERSION = "0.1.0";
+const require = createRequire(import.meta.url);
+const { version: VERSION } = require("../package.json") as { version: string };
 
 async function main(): Promise<void> {
   const program = new Command();
 
-  program
-    .name("adocycle")
-    .description("CLI for Azure DevOps work item workflows")
-    .version(VERSION);
+  program.name("adocycle").description("CLI for Azure DevOps work item workflows").version(VERSION);
 
   registerMineCommand(program);
   registerStartCommand(program);

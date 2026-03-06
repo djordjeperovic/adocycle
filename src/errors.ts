@@ -11,7 +11,9 @@ export class CliError extends Error {
   }
 }
 
-function hasStatusCode(value: unknown): value is { statusCode?: unknown; status?: unknown; response?: { status?: unknown } } {
+function hasStatusCode(
+  value: unknown
+): value is { statusCode?: unknown; status?: unknown; response?: { status?: unknown } } {
   return typeof value === "object" && value !== null;
 }
 

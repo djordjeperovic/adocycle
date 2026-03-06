@@ -119,7 +119,9 @@ export function buildFinishPullRequestDescription(workItem: StartWorkItem): stri
 
 export function selectLatestPullRequest<T extends { pullRequestId?: number }>(pullRequests: T[]): T | undefined {
   return pullRequests
-    .filter((pullRequest): pullRequest is T & { pullRequestId: number } => typeof pullRequest.pullRequestId === "number")
+    .filter(
+      (pullRequest): pullRequest is T & { pullRequestId: number } => typeof pullRequest.pullRequestId === "number"
+    )
     .sort((left, right) => right.pullRequestId - left.pullRequestId)[0];
 }
 
@@ -215,7 +217,9 @@ export async function tryLinkPullRequestToWorkItem(
 
   const artifactUri =
     pullRequest.artifactId ??
-    (repository.projectId ? buildPullRequestArtifactUri(repository.projectId, repository.id, pullRequest.id) : undefined);
+    (repository.projectId
+      ? buildPullRequestArtifactUri(repository.projectId, repository.id, pullRequest.id)
+      : undefined);
 
   if (!artifactUri) {
     return {

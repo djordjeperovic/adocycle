@@ -37,9 +37,7 @@ describe("deriveHeaderLabels", () => {
   });
 
   it("falls back to referenceName when name is empty", () => {
-    const labels = deriveHeaderLabels([
-      { referenceName: "Custom.Field", name: "" }
-    ]);
+    const labels = deriveHeaderLabels([{ referenceName: "Custom.Field", name: "" }]);
     expect(labels).toEqual(["Custom.Field"]);
   });
 });
@@ -56,9 +54,7 @@ describe("renderQueryTable", () => {
       { referenceName: "System.Id", name: "ID" },
       { referenceName: "System.Title", name: "Title" }
     ];
-    const items = [
-      { id: 42, fields: { "System.Id": 42, "System.Title": "Fix bug" } }
-    ];
+    const items = [{ id: 42, fields: { "System.Id": 42, "System.Title": "Fix bug" } }];
     const output = stripAnsi(renderQueryTable(columns, items));
     expect(output).toContain("ID");
     expect(output).toContain("Title");
