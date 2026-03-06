@@ -1,3 +1,4 @@
+import type { WorkItemDetail } from "../ado/workItem.js";
 import type { DoctorReport, MineWorkItem, QueryColumnInfo, QueryWorkItem } from "../types.js";
 
 export function renderMineJson(items: MineWorkItem[]): string {
@@ -19,4 +20,8 @@ export function renderQueryJson(columns: QueryColumnInfo[], items: QueryWorkItem
     return row;
   });
   return JSON.stringify(rows, null, 2);
+}
+
+export function renderShowJson(detail: WorkItemDetail): string {
+  return JSON.stringify(detail, null, 2);
 }

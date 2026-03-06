@@ -1,5 +1,6 @@
 import type * as azdev from "azure-devops-node-api";
 import { CliError } from "../errors.js";
+import { extractDisplayName } from "./workItem.js";
 
 const ASSIGN_WORK_ITEM_FIELDS = [
   "System.Id",
@@ -28,23 +29,7 @@ function getStringField(fields: Record<string, unknown>, fieldName: string): str
 }
 
 export function extractAssignedTo(fields: Record<string, unknown>): string {
-  const value = fields["System.AssignedTo"];
-  if (value === undefined || value === null) {
-    return "";
-  }
-  if (typeof value === "string") {
-    return value.trim();
-  }
-  if (typeof value === "object") {
-    const identity = value as Record<string, unknown>;
-    if (typeof identity.displayName === "string") {
-      return identity.displayName.trim();
-    }
-    if (typeof identity.uniqueName === "string") {
-      return identity.uniqueName.trim();
-    }
-  }
-  return "";
+  return extractDisplayName(fields["System.AssignedTo"]);
 }
 
 export async function fetchWorkItemForAssign(

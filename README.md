@@ -48,6 +48,13 @@ npm run build
 adocycle mine
 ```
 
+### Show full details of a work item
+
+```bash
+adocycle show 12345
+adocycle show 12345 --json
+```
+
 ### Start working on a work item
 
 ```bash
@@ -112,6 +119,10 @@ adocycle doctor --org myorg --repo "https://dev.azure.com/myorg/MyProject/_git/M
 adocycle mine --org myorg --limit 100
 adocycle mine --json
 adocycle mine --reauth
+
+adocycle show 12345 --org myorg
+adocycle show 12345 --json
+adocycle show 12345 --reauth
 
 adocycle start 12345 --base main
 adocycle start 12345 --repo "https://dev.azure.com/myorg/MyProject/_git/MyRepo"

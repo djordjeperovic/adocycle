@@ -23,12 +23,18 @@ CI runs: typecheck → test → build (see `.github/workflows/ci.yml`).
 
 ### Layered structure
 
-- **`src/commands/`** — Commander command registration + orchestration logic. Each file registers one top-level command (`mine`, `start`, `repo`). Commands coordinate between layers but contain no ADO API calls directly.
-- **`src/ado/`** — Azure DevOps API interaction. `client.ts` handles connection/URL normalization. `myWork.ts` and `wiqlFallback.ts` fetch work items (with automatic fallback). `start.ts` contains branch creation, work-item linking, and state transition logic. `normalize.ts` converts raw API responses into typed `MineWorkItem` objects.
+- **`src/commands/`** — Commander command registration + orchestration logic. Each file registers one top-level command (`mine`, `show`, `start`, `finish`, `comment`, `assign`, `query`, `repo`, `doctor`). Commands coordinate between layers but contain no ADO API calls directly.
+- **`src/ado/`** — Azure DevOps API interaction. `client.ts` handles connection/URL normalization. `myWork.ts` and `wiqlFallback.ts` fetch work items (with automatic fallback). `workItem.ts` fetches a single work item with all fields, relations, and paginated comments. `start.ts` contains branch creation, work-item linking, and state transition logic. `finish.ts` creates/reuses pull requests and transitions state. `comment.ts` adds comments to work items. `assign.ts` handles work item assignment. `identity.ts` resolves email addresses to ADO identities via the IdentityPicker API. `normalize.ts` converts raw API responses into typed `MineWorkItem` objects.
 - **`src/auth/`** — Credential resolution with a priority chain: CLI flag → env var (`ADO_ORG`/`ADO_PAT`) → config file → interactive prompt. On auth failure, commands auto-retry with a fresh PAT prompt when running in a TTY.
 - **`src/config/`** — Zod-validated JSON config stored at the platform-specific path from `env-paths`. Config file is `chmod 0o600` on write.
 - **`src/repo/`** — Parses Azure Repos URLs (dev.azure.com, visualstudio.com, SSH) and resolves local git paths by reading the `origin` remote.
 - **`src/output/`** — Table rendering (`cli-table3` + `chalk`) and JSON output. Terminal width is adaptive.
+- **`src/doctor/`** — Health check probes (`probes.ts`) and check orchestration (`checks.ts`) for `adocycle doctor`.
+- **`src/commands/shared.ts`** — Shared argument parsers (e.g., `parseWorkItemId`) used by multiple commands.
+
+### Data flow for `show`
+
+`commands/show.ts` → resolves credentials → `ado/workItem.ts` fetches work item with `WorkItemExpand.All` + paginated comments via `getComments` → renders table or JSON output.
 
 ### Data flow for `start`
 

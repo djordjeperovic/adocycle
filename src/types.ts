@@ -70,6 +70,12 @@ export interface ResolvedRepoTarget {
   localPath?: string;
 }
 
+export interface ShowCommandOptions {
+  org?: string;
+  json?: boolean;
+  reauth?: boolean;
+}
+
 export interface QueryCommandOptions {
   org?: string;
   project?: string;

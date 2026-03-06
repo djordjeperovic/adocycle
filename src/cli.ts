@@ -9,6 +9,7 @@ import { registerFinishCommand } from "./commands/finish.js";
 import { registerMineCommand } from "./commands/mine.js";
 import { registerQueryCommand } from "./commands/query.js";
 import { registerRepoCommands } from "./commands/repo.js";
+import { registerShowCommand } from "./commands/show.js";
 import { registerStartCommand } from "./commands/start.js";
 import { CliError } from "./errors.js";
 
@@ -21,6 +22,7 @@ async function main(): Promise<void> {
   program.name("adocycle").description("CLI for Azure DevOps work item workflows").version(VERSION);
 
   registerMineCommand(program);
+  registerShowCommand(program);
   registerStartCommand(program);
   registerFinishCommand(program);
   registerCommentCommand(program);
